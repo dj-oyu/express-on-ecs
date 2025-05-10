@@ -1,0 +1,43 @@
+# Node.js/Next.js/Vite/Express向け .gitignore
+
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build output
+dist/
+build/
+coverage/
+.vite/
+.next/
+out/
+.eslintcache
+
+# dotenv environment files
+.env
+.env.*
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# AWS/ECS
+*.iml
+
+# TurboRepo
+.turbo/
+
+# ドキュメント
+docs/

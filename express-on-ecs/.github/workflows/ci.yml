@@ -1,0 +1,75 @@
+name: CI/CD for express-on-ecs
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, "feature/**", "fix/**"]
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: ap-northeast-1
+      ECR_REPOSITORY: express-on-ecs
+      IMAGE_TAG: latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./express-on-ecs
+
+      - name: Lint
+        run: npm run lint
+        working-directory: ./express-on-ecs
+
+      - name: Run tests
+        run: npm run test -- --coverage
+        working-directory: ./express-on-ecs
+
+      - name: Build app
+        run: npm run build
+        working-directory: ./express-on-ecs
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push Docker image to ECR
+        run: |
+          docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
+          docker tag $ECR_REPOSITORY:$IMAGE_TAG ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG
+        working-directory: ./express-on-ecs
+
+      - name: Register ECS task definition
+        run: |
+          aws ecs register-task-definition --cli-input-json file://task-definition.json
+        working-directory: ./express-on-ecs
+
+      - name: Deploy to ECS (force new deployment)
+        run: |
+          aws ecs update-service --cluster ${{ secrets.ECS_CLUSTER_NAME }} --service ${{ secrets.ECS_SERVICE_NAME }} --force-new-deployment
+        working-directory: ./express-on-ecs
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: ./express-on-ecs/coverage/lcov-report

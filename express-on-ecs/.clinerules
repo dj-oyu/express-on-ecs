@@ -1,0 +1,29 @@
+# .clinerules
+
+## short steps (進行中/ToDo)
+- ECS用task-definition.jsonの作成
+- .env.exampleの作成
+- .gitignoreの作成
+- docs/配下のドキュメント整備
+- CI/CD（.github/workflows/ci.yml）自動化
+- README.mdのECSデプロイ手順追記
+
+## long steps (全体工程)
+1. 要望の再構築
+2. 要件定義書(PRD)の作成
+3. ユーザージャーニー設計
+4. 使用技術と依存ライブラリの決定
+5. アーキテクチャ設計
+6. フォルダ・ファイル構成設計
+7. コード実装・ECS用ファイル生成
+8. 自動テスト
+9. CI/CD構成
+10. デプロイ手順
+
+## insights (注意点・設計指針)
+- ECS/Fargate用のDockerイメージはECRにpush
+- タスク定義の環境変数は.env.exampleを参考に
+- CI/CDはGitHub Actionsで自動化
+- mainブランチへのマージはテスト・Lint必須
+- AWSリソースの権限設計・セキュリティに注意
+- ドキュメント・サンプルファイルを必ず整備
