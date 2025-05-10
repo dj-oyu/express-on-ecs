@@ -7,7 +7,8 @@
     "dev": "concurrently \"vite\" \"NODE_OPTIONS='--experimental-specifier-resolution=node' node --loader ts-node/esm src/server.ts\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "concurrently \"node dist/server.js\" \"npm run preview\""
   },
   "dependencies": {
     "express": "^5.1.0",
